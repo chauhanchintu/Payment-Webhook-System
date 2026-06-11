@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: webhook_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  webhook-app:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/webhook_db
+      SECRET_KEY: test_secret
+    volumes:
+      - ./mock_payloads:/app/mock_payloads
+
+volumes:
+  postgres_data:
